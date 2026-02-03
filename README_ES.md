@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Resumen Ejecutivo (The "Why")
+## 1. Resumen Ejecutivo 
 
 En logística industrial, la mayoría de los sistemas de planificación fallan porque asumen condiciones ideales y estáticas. **PRIME LOGISTICS** no es simplemente un sistema de ruteo; es un **motor de estrés operacional** que cuantifica el riesgo oculto dentro de su infraestructura de suministro.
 
@@ -14,7 +14,7 @@ Mediante una arquitectura de simulación **Monte Carlo con Convergencia Dual**, 
 
 ---
 
-## 2. Capacidades Actuales (The "What")
+## 2. Capacidades Actuales 
 
 ### A. Construcción de Topología Multidimensional (Bloque 1)
 
@@ -38,7 +38,7 @@ Implementa un **modelo de propagación de riesgo jerárquico** que simula la rea
 
 ---
 
-## 3. Fundamentación Matemática (The "Logic")
+## 3. Fundamentación Matemática 
 
 ### El Modelo de Intensidad de Riesgo
 
@@ -93,7 +93,7 @@ El sistema está estructurado en **tres bloques modulares** que operan en secuen
 
 ---
 
-## 5. Rigor de Implementación (Tech Specs)
+## 5. Rigor de Implementación 
 
 ### Manejo de Matrices Dispersas
 - **Tecnología:** Implementado con `scipy.sparse`.
@@ -122,8 +122,8 @@ El motor no usa un número de iteraciones fijo. En su lugar, implementa un **cri
 
 | Bloque | Nombre | Estado | Notas |
 |--------|---------|---------|-------|
-| **1** | Topología Multidimensional |  **100% Finalizado** | Generación estable del modelo de 5 matrices (A, C, T, K, D). |
-| **2** | Motor de Riesgo Estocástico |  **100% Finalizado** | Simulación de cascada con convergencia dual operativa. |
+| **1** | Topología Multidimensional |  **Finalizado** | Generación estable del modelo de 5 matrices (A, C, T, K, D). |
+| **2** | Motor de Riesgo Estocástico |  **Finalizado** | Simulación de cascada con convergencia dual operativa. |
 | **3** | Optimización & Mitigación |  **En Diseño Conceptual** | Definición de la "Función Objetivo de Mínimo Arrepentimiento". |
 
 ---
