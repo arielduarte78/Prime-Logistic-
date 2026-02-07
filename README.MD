@@ -1,4 +1,4 @@
-# 🚛 PRIME LOGISTICS
+# PRIME LOGISTICS
 
 <h3 align="center">Decision Intelligence Framework for Stochastic Networks</h3>
 
@@ -38,10 +38,10 @@
   <p>It does not just find the fastest route; it finds the route that survives.</p>
   <p><strong>Core Pillars:</strong></p>
   <ul>
-    <li>🌐 <strong>Digital Twin:</strong> 5-Matrix Topology.</li>
-    <li>🌪️ <strong>Chaos Engine:</strong> Stochastic Stress-Testing.</li>
-    <li>⚖️ <strong>Bayesian Auditor:</strong> Fragility Inference.</li>
-    <li>🧠 <strong>Prime Strategist:</strong> Pareto & Entropy Optimization.</li>
+    <li> <strong>Digital Twin:</strong> 5-Matrix Topology.</li>
+    <li> <strong>Chaos Engine:</strong> Stochastic Stress-Testing.</li>
+    <li> <strong>Bayesian Auditor:</strong> Fragility Inference.</li>
+    <li> <strong>Prime Strategist:</strong> Pareto & Entropy Optimization.</li>
   </ul>
 </td>
 <td valign="top">
@@ -51,10 +51,10 @@
   <p>No busca solo la ruta más rápida; busca la ruta que sobrevive.</p>
   <p><strong>Pilares Centrales:</strong></p>
   <ul>
-    <li>🌐 <strong>Gemelo Digital:</strong> Topología de 5 Matrices.</li>
-    <li>🌪️ <strong>Motor de Caos:</strong> Stress-Testing Estocástico.</li>
-    <li>⚖️ <strong>Auditor Bayesiano:</strong> Inferencia de Fragilidad.</li>
-    <li>🧠 <strong>Estratega Prime:</strong> Optimización de Pareto y Entropía.</li>
+    <li> <strong>Gemelo Digital:</strong> Topología de 5 Matrices.</li>
+    <li> <strong>Motor de Caos:</strong> Stress-Testing Estocástico.</li>
+    <li> <strong>Auditor Bayesiano:</strong> Inferencia de Fragilidad.</li>
+    <li> <strong>Estratega Prime:</strong> Optimización de Pareto y Entropía.</li>
   </ul>
 </td>
 </tr>
@@ -62,12 +62,12 @@
 
 <hr/>
 
-## 🔐 Intellectual Property / Propiedad Intelectual
+##  Intellectual Property / Propiedad Intelectual
 
 <table>
 <tr>
 <td align="center">
-  <h3>⚠️ PRIVATE SOURCE CODE | PUBLIC DOCUMENTATION</h3>
+  <h3> PRIVATE SOURCE CODE | PUBLIC DOCUMENTATION</h3>
   <p>
     This repository serves as a <strong>technical showcase</strong>.<br/>
     The proprietary algorithms for stochastic optimization and Bayesian inference are private.
@@ -82,7 +82,7 @@
 
 <br/>
 
-## 👤 Author / Autor
+##  Author / Autor
 
 **Ariel Duarte**
 <br/>
