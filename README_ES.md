@@ -16,7 +16,7 @@ No te damos la ruta más rápida. Te damos la ruta más **Antifrágil**.
 
 ---
 
-## 🏗️ Arquitectura del Sistema
+## Arquitectura del Sistema
 
 El sistema opera como un pipeline secuencial de 4 fases, transformando datos físicos en decisiones estratégicas.
 
@@ -90,7 +90,7 @@ La implementación exacta de los algoritmos estocásticos, el pipeline de infere
 
 ---
 
-## 👤 Sobre el Autor
+## Sobre el Autor
 
 **Ariel Duarte**
 Con 20 años y formación en Ingeniería Industrial, desarrollé Prime Logistics para cerrar la brecha entre la teoría matemática compleja y la operación logística real. Mi enfoque combina la rigurosidad académica con la ejecución de software de alto nivel.
