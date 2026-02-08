@@ -422,3 +422,20 @@ Entrega algo más valioso:
 - Cuantificación del riesgo,
 - Y decisiones que siguen siendo válidas cuando el mundo no coopera.
 
+
+
+## 11. Limitaciones Conocidas y Suposiciones 
+
+Para mantener la viabilidad computacional en este MVP, el modelo acepta los siguientes trade-offs teóricos:
+
+### 1. **Independencia Ingenua en la Inferencia**
+La actualización Beta-Binomial asume intercambiabilidad de las ejecuciones de simulación. Si bien el Chaos Engine genera fallas correlacionadas (cascadas), el paso de inferencia trata la evidencia como pseudo-independiente para calcular la fragilidad local. Esto puede llevar a una confianza excesiva en el posterior para redes altamente acopladas.
+
+### 2. **Enfoque Estructural vs. Operacional**
+El modelo minimiza el riesgo estructural (disponibilidad de conexiones) en lugar de la latencia operacional (retrasos en colas). Actualmente no implementa dinámicas de colas M/G/k en los nodos; solo considera restricciones de capacidad puras.
+
+### 3. **Flujo Estático**
+El optimizador actual asume enrutamiento estático por paso de simulación, ignorando las capacidades de re-enrutamiento dinámico de los agentes durante el evento de falla.
+
+**Estas restricciones son decisiones de diseño deliberadas para priorizar la escala (>10k nodos) sobre la precisión de micro-simulación.**
+
