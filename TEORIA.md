@@ -167,14 +167,15 @@ El universo de riesgos se define en un **Manifiesto Declarativo**, estructurado 
 Cada evento **Eᵢ** se define como una tupla:
 Eᵢ = ⟨ Code, P_base, Target, Effects, Conditioners ⟩
 
-text
 
 ## 4. Mecánica de Cascada (Probabilidad Efectiva)
 
 El Chaos Engine no asume independencia entre sucesos. Implementa un modelo de **Inferencia Causal Simplificada** donde la ocurrencia de eventos "padres" amplifica la probabilidad de eventos "hijos".
 
 La probabilidad efectiva de activación de un evento **Eⱼ** dado un conjunto de eventos activos **Ω**, se calcula como:
+
 P_eff(Eⱼ | Ω) = min(1.0, P_base(Eⱼ) × ∏ᵢ∈Ω φᵢ→ⱼ)
+
 Donde **φᵢ→ⱼ** es el multiplicador de impacto definido en los Conditioners del manifiesto. Esto permite modelar colapsos en cadena (ej. Inundación → Bloqueo de Ruta).
 
 ## 5. Dinámica de Intensidad (Stress Index)
