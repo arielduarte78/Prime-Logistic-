@@ -70,7 +70,13 @@ Sea **n = |V|**. Se definen las siguientes matrices en **ℝⁿˣⁿ**:
 - **Matriz de Costos C = (cᵢⱼ)**
 - **Matriz de Tiempos T = (tᵢⱼ)**
 - **Matriz de Capacidades K = (kᵢⱼ)**
-- **Matriz de Demanda = (dᵢⱼ)**
+- **Vector de Demanda = (dᵢⱼ)**
+
+**Vector de Demanda d:**
+
+d ∈ ℝⁿ = [d₁, d₂, ..., dₙ]ᵀ
+
+**dᵢ:** La cantidad de carga que el nodo i necesita recibir (o entregar).
 
 Todas las matrices comparten el mismo espacio de índices **V × V**, lo que garantiza coherencia estructural entre dimensiones.
 
