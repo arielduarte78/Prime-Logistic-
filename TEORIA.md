@@ -25,8 +25,48 @@ En particular:
 Estos algoritmos no constituyen el núcleo conceptual del sistema, sino que actúan como mecanismos de proyección que permiten mapear el estado probabilístico de la red en decisiones operativas concretas.
 
 
+# Fundamentos Matemáticos — Bloque I
+## Definición Formal de la Red Logística (Gemelo Digital)
+
+Esta sección establece el objeto matemático fundamental sobre el cual opera todo el framework de Prime Logistics. El propósito del Bloque I no es optimizar, predecir ni decidir. Su único objetivo es construir un gemelo digital estructuralmente válido y matemáticamente explícito de la red logística física.
+
+Toda simulación estocástica e inferencia posterior se define estrictamente como operadores que actúan sobre este objeto.
+
+**Cualquier pérdida de rigor en esta etapa se propaga de forma irreversible a través del sistema.**
+
+### 1. La Red como Grafo Dirigido con Atributos
+
+El sistema logístico se modela como un grafo dirigido:
+
+**G = (V, E)**
+
+donde:
+
+- **V = {v₁, ..., vₙ}** es el conjunto finito de nodos logísticos (plantas productivas, depósitos, cross-docks, puntos de demanda).
+- **E ⊆ V × V** es el conjunto de arcos dirigidos que representan enlaces de transporte físicamente factibles.
+
+Cada arco **eᵢⱼ ∈ E** está caracterizado por un vector de atributos observables:
+
+**eᵢⱼ = (cᵢⱼ, tᵢⱼ, kᵢⱼ, dᵢⱼ)**
+
+donde:
+
+- **cᵢⱼ ∈ ℝ⁺** representa el costo monetario esperado,
+- **tᵢⱼ ∈ ℝ⁺** representa el tiempo de tránsito esperado,
+- **kᵢⱼ ∈ ℝ⁺** representa la capacidad máxima de transporte,
+- **dᵢⱼ ∈ ℝ⁺** representa la distancia física u otra métrica espacial equivalente.
+
+Estas magnitudes se tratan como parámetros exógenos y observados. En este bloque no se les asigna interpretación probabilística alguna.
+
+### 2. Representación Matricial Multicapa
+
+En lugar de operar directamente sobre la estructura del grafo, el sistema proyecta **G** a una representación matricial multicapa, que actúa como descripción canónica del estado de la red.
+
+Sea **n = |V|**. Se definen las siguientes matrices en **ℝⁿˣⁿ**:
+
 
 #### Matrices de Atributos
+- **Matriz de adyacencia A = (Aᵢⱼ)**
 - **Matriz de Costos C = (cᵢⱼ)**
 - **Matriz de Tiempos T = (tᵢⱼ)**
 - **Matriz de Capacidades K = (kᵢⱼ)**
@@ -63,7 +103,7 @@ Si alguna de estas condiciones se viola, la instancia es explícitamente rechaza
 
 Un principio central de diseño en Prime Logistics es la separación rigurosa entre topología y riesgo.
 
-En el Bloque I:
+**En el Bloque I:**
 - Ningún arco posee probabilidad de fallo,
 - No se modela comportamiento aleatorio alguno,
 - No se asume incertidumbre.
@@ -83,7 +123,7 @@ En particular:
 - Algoritmos de caminos mínimos (por ejemplo, Dijkstra) se emplean para verificar conectividad y generar rutas factibles de referencia,
 - Dichos algoritmos operan exclusivamente sobre instancias deterministas de la red.
 
-Su rol es interrogar la estructura, no tomar decisiones.
+**Su rol es interrogar la estructura, no tomar decisiones.**
 
 La inteligencia del sistema emerge únicamente cuando estas proyecciones deterministas son sometidas a estrés estocástico en los bloques posteriores.
 
@@ -96,6 +136,27 @@ El Bloque I establece:
 - Un sustrato limpio sobre el cual pueden actuar la simulación estocástica y la inferencia bayesiana.
 
 
+# Bloque II — Chaos Engine: Simulación Estocástica Bajo Incertidumbre Estructural
+
+## 1. Propósito del Bloque
+
+El Chaos Engine tiene como objetivo someter la red logística modelada en el Bloque I a un proceso sistemático de estrés estocástico, generando un conjunto de futuros plausibles bajo incertidumbre profunda.
+
+A diferencia de los enfoques clásicos de confiabilidad, este bloque no asume probabilidades fijas ni independencia entre eventos, sino que construye un espacio de escenarios adversos donde emergen fallas correlacionadas, cascadas sistémicas y degradaciones no lineales.
+
+**El resultado del Chaos Engine no es una predicción, sino un conjunto estadísticamente representativo de realizaciones posibles del sistema.**
+
+## 2. Espacio de Estados del Sistema
+
+Sea **G = (V, E)** el grafo dirigido definido en el Bloque I.
+
+El estado de la red en un escenario **k** se representa mediante un vector binario:
+
+**X⁽ᵏ⁾ = {Xᵢⱼ⁽ᵏ⁾ : eᵢⱼ ∈ E}**
+
+donde:
+Xᵢⱼ⁽ᵏ⁾ =  1 si el arco (i,j) está operativo en el escenario k
+0 si el arco falla o queda interdictado 
 
 
 Este estado determina la capacidad efectiva, conectividad y costos realizables de la red bajo dicho escenario.
@@ -176,6 +237,7 @@ Este proceso se repite para **k = 1, …, N**, generando una distribución empí
 ## 7. Convergencia Estocástica Adaptativa
 
 El número de escenarios **N** no es fijo. El Chaos Engine implementa un criterio de parada basado en estabilidad estadística.
+
 Sea **K⁽ᵏ⁾** una métrica agregada (por ejemplo, capacidad total de la red). La simulación se detiene cuando:
 
 **Δσᴋ² / σᴋ² < ε**
@@ -195,12 +257,18 @@ El Chaos Engine produce un conjunto:
 **X = {X⁽¹⁾, …, X⁽ᴺ⁾}**
 
 junto con métricas asociadas por escenario.
+
 Este conjunto constituye la evidencia empírica que alimenta al Bloque III.
 
-## 9. Interpretación Fundamental
+## 9. Interpretación 
 
-Este bloque modela el espacio de estrés plausible al que una red puede verse sometida.
-La fragilidad no se asume, emerge.
+**Este bloque no modela el "futuro más probable".**
+
+**Modela el espacio de estrés plausible al que una red puede verse sometida.**
+
+**La fragilidad emerge.**
+
+
 
 
 # Bloque III — Bayesian Auditor: Inferencia de Fragilidad Bajo Evidencia No-IID
@@ -209,7 +277,7 @@ La fragilidad no se asume, emerge.
 
 El Bayesian Auditor transforma el conjunto de escenarios simulados por el Chaos Engine en conocimiento probabilístico estructurado.
 
-Su función es inferir parámetros latentes del sistema: fragilidad, riesgo residual y confiabilidad efectiva de nodos y arcos, bajo condiciones de dependencia, correlación y evidencia sintética.
+Su función no es describir lo que ocurrió en la simulación, sino inferir parámetros latentes del sistema: fragilidad, riesgo residual y confiabilidad efectiva de nodos y arcos, bajo condiciones de dependencia, correlación y evidencia sintética.
 
 **Este bloque responde a una pregunta central:**
 
@@ -223,7 +291,7 @@ Los datos producidos por el Bloque II no cumplen los supuestos clásicos de la i
 - **No son idénticamente distribuidos** (escenarios heterogéneos).
 - **No provienen del mundo real**, sino de simulación estructurada.
 
-Por lo tanto, el objetivo es actualizar creencias racionales sobre el comportamiento del sistema bajo estrés.
+Por lo tanto, el objetivo no es estimar una probabilidad frecuentista "real", sino actualizar creencias racionales sobre el comportamiento del sistema bajo estrés.
 
 **Esto sitúa naturalmente el problema en un marco Bayesiano.**
 
@@ -244,6 +312,9 @@ Esta cantidad:
 ## 4. Modelo de Observación
 
 A partir del Chaos Engine se obtiene, para cada componente **u**, una secuencia de observaciones binarias:
+Yᵤ⁽ᵏ⁾ = 1 si el componente sobrevive en el escenario k
+0 si falla 
+
 
 Estas observaciones no se asumen independientes, pero se utilizan como evidencia agregada.
 
@@ -290,15 +361,15 @@ La fragilidad inferida se define como la esperanza posterior:
 
 **φ̂ᵤ = 1 − E[θᵤ] = 1 − (α₀ + sᵤ) / (α₀ + β₀ + N)**
 
-Este valor es una medida racional de riesgo estructural, condicionada al espacio de estrés explorado.
+Este valor no es una "probabilidad verdadera", sino una medida racional de riesgo estructural, condicionada al espacio de estrés explorado.
 
 ## 8. Evidencia Correlacionada y Justificación Epistémica
 
 Aunque las observaciones no son i.i.d., el uso del modelo Beta es epistémicamente válido porque:
 
-- El objetivo es la evaluación de fragilidad.
+- El objetivo no es inferencia causal, sino evaluación de fragilidad.
 - La correlación es inducida deliberadamente para revelar vulnerabilidades sistémicas.
-- El modelo actúa como un agregador de evidencia bajo estrés.
+- El modelo actúa como un agregador de evidencia bajo estrés, no como un estimador frecuentista.
 
 En este contexto, el posterior refleja:
 
@@ -312,7 +383,7 @@ El resultado del bloque es un vector:
 
 Este mapa de fragilidad se convierte en una nueva capa semántica de la red, desacoplada de la topología física.
 
-A partir de este punto:
+**A partir de este punto:**
 
 - La red deja de ser solo geométrica,
 - Pasa a ser probabilística y estratégica.
@@ -328,11 +399,51 @@ El Bayesian Auditor produce:
 Este output alimenta directamente al Bloque IV, donde la optimización deja de ser determinista y pasa a ser una negociación explícita entre costo, riesgo y robustez.
 
 
+# Bloque IV — Optimización Estratégica Bajo Incertidumbre (Prime Strategist)
+
+## 1. Naturaleza del Problema de Decisión
+
+Una vez inferida la fragilidad estructural de la red, el problema deja de ser puramente algorítmico y pasa a ser decisional.
+
+El sistema ya no enfrenta una red con pesos fijos, sino una red caracterizada por:
+
+- Costos deterministas,
+- Tiempos esperados,
+- Capacidades finitas,
+- **Y riesgos inferidos probabilísticamente.**
+
+En este contexto, **no existe una única solución óptima.**  
+Cualquier decisión implica un compromiso explícito entre objetivos incompatibles.
+
+## 2. Rechazo del Óptimo Determinista
+
+Los algoritmos clásicos de optimización logística (Shortest Path, VRP, Min-Cost Flow) asumen implícitamente:
+
+- Un único futuro,
+- Parámetros conocidos,
+- Y una función objetivo escalar.
+
+**Bajo incertidumbre estructural, estas suposiciones colapsan.**
+
+Prime Logistics adopta una postura distinta:
+
+> El objetivo no es minimizar una función, sino elegir bajo riesgo de estar equivocado.
+
+Esto desplaza el problema desde la optimización determinista hacia la teoría de decisión bajo incertidumbre.
+
+## 3. Espacio de Soluciones y Rutas Candidatas
+
+Sea **R** el conjunto de rutas factibles entre un origen y un destino.
+
+Cada ruta **R ∈ R** induce un vector de atributos:
+z(R) = C(R) ← Costo total
+Φ(R) ← Riesgo agregado de fallo
+H(R) ← Entropía estructural del riesgo
 
 
 ## 4. Agregación del Riesgo
 
-El riesgo total de una ruta no se modela como una suma de probabilidades.
+El riesgo total de una ruta **no se modela como una suma ingenua de probabilidades.**
 
 Sea **φ̂ₑ** la fragilidad inferida de cada arco **e ∈ R**.
 
@@ -368,12 +479,12 @@ En su lugar, construye la **Frontera de Pareto** en el espacio:
 
 **(C(R), Φ(R), 1 − Hₙₒᵣₘ(R))**
 
-Una ruta es Pareto-dominada si existe otra que:
+Una ruta es **Pareto-dominada** si existe otra que:
 
 - No es peor en ningún criterio,
 - Y es estrictamente mejor en al menos uno.
 
-El resultado es un conjunto de soluciones eficientes.
+**El resultado es un conjunto de soluciones eficientes, no una única respuesta.**
 
 ## 7. Escalarización Estratégica (Opcional)
 
@@ -386,7 +497,7 @@ donde:
 - **λ**: aversión al riesgo,
 - **γ**: penalización por rigidez estructural.
 
-Estos parámetros son estratégicos. 
+Estos parámetros **no son técnicos, sino estratégicos.**  
 Representan la postura de decisión del operador.
 
 ## 8. Algoritmos Utilizados
@@ -396,7 +507,8 @@ Para exploración y resolución:
 - Variantes de Dijkstra multi-criterio,
 - Poda por dominancia de Pareto,
 - Heurísticas de enumeración de rutas factibles.
-Se busca la insuficiencia decisional bajo restricciones reales.
+
+**No se busca exhaustividad combinatoria, sino suficiencia decisional bajo restricciones reales.**
 
 ## 9. Clasificación Estratégica de Soluciones
 
@@ -407,7 +519,7 @@ Las rutas resultantes se agrupan en arquetipos interpretables:
 - **El Equilibrista**: compromiso eficiente.
 - **El Ilusionista**: barato pero frágil (riesgo oculto).
 
-Esto convierte el output matemático en lenguaje de decisión humana.
+Esto convierte el output matemático en **lenguaje de decisión humana.**
 
 ## 10. Interpretación Final
 
@@ -415,13 +527,12 @@ Este bloque formaliza una idea central:
 
 > En sistemas complejos, decidir es elegir qué error estás dispuesto a tolerar.
 
-Prime Logistics no promete certezas.  
+Prime Logistics **no promete certezas.**  
 Entrega algo más valioso:
 
 - Visibilidad de trade-offs,
 - Cuantificación del riesgo,
 - Y decisiones que siguen siendo válidas cuando el mundo no coopera.
-
 
 
 ## 11. Limitaciones Conocidas y Suposiciones 
@@ -432,10 +543,9 @@ Para mantener la viabilidad computacional en este MVP, el modelo acepta los sigu
 La actualización Beta-Binomial asume intercambiabilidad de las ejecuciones de simulación. Si bien el Chaos Engine genera fallas correlacionadas (cascadas), el paso de inferencia trata la evidencia como pseudo-independiente para calcular la fragilidad local. Esto puede llevar a una confianza excesiva en el posterior para redes altamente acopladas.
 
 ### 2. **Enfoque Estructural vs. Operacional**
-El modelo minimiza el riesgo estructural (disponibilidad de conexiones) en lugar de la latencia operacional (retrasos en colas). Actualmente no implementa dinámicas de colas M/G/k en los nodos; solo considera restricciones de capacidad puras.
+El modelo minimiza el *riesgo estructural* (disponibilidad de conexiones) en lugar de la *latencia operacional* (retrasos en colas). Actualmente no implementa dinámicas de colas M/G/k en los nodos; solo considera restricciones de capacidad puras.
 
 ### 3. **Flujo Estático**
-El optimizador actual asume enrutamiento estático por paso de simulación, ignorando las capacidades de re-enrutamiento dinámico de los agentes durante el evento de falla.
+El optimizador actual asume enrutamiento estático por paso de simulación, ignorando las capacidades de re-enrutamiento dinámico de los agentes *durante* el evento de falla.
 
 **Estas restricciones son decisiones de diseño deliberadas para priorizar la escala (>10k nodos) sobre la precisión de micro-simulación.**
-
