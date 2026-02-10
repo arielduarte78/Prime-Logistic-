@@ -37,13 +37,20 @@ Calcula distancias exactas entre puntos (Utilizando la formula de Haversine).
 
 Crea una "foto" perfecta de cómo está todo en condiciones normales.
 
+
 Código clave:
 
 python
-# Calcula distancia entre dos puntos en la Tierra
+
+#Calcula distancia entre dos puntos en la Tierra
+
 def calcular_distancia(lat1, lon1, lat2, lon2):
+
     # Fórmula de Haversine (precisa para distancias largas)
+    
     return distancia_km
+
+
 
 
 ### Bloque 2: El "Motor del Caos"
