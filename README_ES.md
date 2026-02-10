@@ -1,4 +1,4 @@
-#  PRIME LOGISTICS
+# PRIME LOGISTICS
 
 ### El Problema que Resuelvo:
 Las apps de ruteo (Google Maps, Waze) te muestran el camino más rápido asumiendo que todo funciona perfecto. Pero en el mundo real hay paros de transporte que cortan rutas, inundaciones que hacen caminos intransitables, bloqueos por protestas, fallas mecánicas que retrasan todo...
@@ -26,49 +26,29 @@ Convierte una red logística (depósitos, clientes, rutas) en matrices matemáti
 
 Lo hace de la siguiente manera:
 
- . Toma ubicaciones reales (latitud/longitud).
-
- . Calcula distancias exactas entre puntos (Utilizando la formula de Haversine).
-
- . Crea una "foto" perfecta de cómo está todo en condiciones normales.
+- Toma ubicaciones reales (latitud/longitud)
+- Calcula distancias exactas entre puntos (Utilizando la formula de Haversine)
+- Crea una "foto" perfecta de cómo está todo en condiciones normales
 
 
-#Código de ejemplo:
-
-python
-
-#Calcula distancia entre dos puntos en la Tierra
-
+```python
+# Ejemplo de Código:
 def calcular_distancia(lat1, lon1, lat2, lon2):
-
     # Fórmula de Haversine (precisa para distancias largas)
-    
     return distancia_km
-
-
-
-
-
-
-
-
+```
 
 ### Bloque 2: El "Motor del Caos"
 
 Simula miles de posibles futuros donde las cosas pueden salir mal.
 
-lo hace de la suguiente manera:
+Lo hace de la siguiente manera:
 
- ."¿Qué pasa si hoy hay paro nacional?" → Multiplica costos y tiempos
-
- ."¿Y si además hay inundación?" → Corta rutas completas
-
- ."¿Cómo afecta un bloqueo si ya hay caos?" → Los efectos se amplifican
+- "¿Qué pasa si hoy hay paro nacional?" → Multiplica costos y tiempos
+- "¿Y si además hay inundación?" → Corta rutas completas
+- "¿Cómo afecta un bloqueo si ya hay caos?" → Los efectos se amplifican
 
 Los eventos no son independientes. Un paro nacional hace 8 veces más probable una huelga local. Esto simula cascadas reales de problemas.
-
-
-
 
 ### Bloque 3: El "Auditor Bayesiano"
 
@@ -76,41 +56,31 @@ Aprende de las simulaciones para decirte qué partes de tu red son más frágile
 
 Cómo funciona:
 
- .Mira los 1000 futuros simulados.
+- Mira los 1000 futuros simulados
+- Cuenta cuántas veces falló cada ruta/nodo
+- Calcula no solo si falla, sino cuánto duele cuando falla
 
- .Cuenta cuántas veces falló cada ruta/nodo.
-
- .Calcula no solo si falla, sino cuánto duele cuando falla.
-
-métrica:
-
+**Métrica clave:**
+```
 Fragilidad = Probabilidad de fallo × Impacto promedio cuando falla
+```
 
 Es importante porque una ruta que falla poco pero causa caos total es MÁS riesgosa que una que falla seguido pero con poco efecto.
-
-
-
 
 ### Bloque 4: El "Estratega"
 
 Recomienda rutas considerando 3 cosas a la vez:
 
- .Costo (dinero)
-
- .Riesgo (chance de que falle)
-
- .Robustez (cómo está distribuido el riesgo)
+- Costo (dinero)
+- Riesgo (chance de que falle)
+- Robustez (cómo está distribuido el riesgo)
 
 No da UNA mejor ruta. Ofrece varias opciones y dice:
 
-
- 1."El Unicornio": Barato Y seguro (raro pero existe)
-
- 2."El Tanque": Caro pero casi infalible
-
- 3."El Apostador": Muy barato, pero riesgoso
-
- 4."El Equilibrista": Balance perfecto costo/riesgo
+1. **"El Unicornio":** Barato Y seguro (raro pero existe)
+2. **"El Tanque":** Caro pero casi infalible
+3. **"El Apostador":** Muy barato, pero riesgoso
+4. **"El Equilibrista":** Balance perfecto costo/riesgo
 
 El usuario elige según su prioridad del día.
 
@@ -118,29 +88,22 @@ El usuario elige según su prioridad del día.
 
 # Cómo lo Implementé
 
-Tecnologías usadas:
+**Tecnologías usadas:**
 
- .Python 3.10+ con tipado estático
+- Python 3.10+ con tipado estático
+- NumPy/SciPy para cálculos científicos rápidos
+- Matrices dispersas para manejar redes grandes eficientemente
+- Simulación Monte Carlo para explorar futuros posibles
 
- .NumPy/SciPy para cálculos científicos rápidos
+**Estructura del código:**
 
- .Matrices dispersas para manejar redes grandes eficientemente
-
- .Simulación Monte Carlo para explorar futuros posibles
-
- 
-
-# Estructura del código:
-
+```
 prime_logistics/
-
 ├── bloque1/    # Modelado de red
-
 ├── bloque2/    # Simulación de eventos
-
 ├── bloque3/    # Inferencia Bayesiana
-
 └── bloque4/    # Optimización estratégica
+```
 
 Cada bloque es independiente pero se conecta limpamente con los otros.
 
@@ -148,43 +111,31 @@ Cada bloque es independiente pero se conecta limpamente con los otros.
 
 ## Próximas features:
 
- Dashboard web interactivo
+- Dashboard web interactivo
+- Integración con APIs de tráfico en tiempo real
+- Alertas tempranas de eventos programados
+- Modelos más complejos de dependencia entre eventos
 
- Integración con APIs de tráfico en tiempo real
+## Limitaciones actuales:
 
- Alertas tempranas de eventos programados
+- Asume que los eventos son independientes (en realidad se afectan más)
+- No considera tiempos de carga/descarga en nodos
+- Necesita datos históricos para calibrar bien las probabilidades
 
- Modelos más complejos de dependencia entre eventos
-
- 
-
-# Limitaciones actuales:
-
-_Asume que los eventos son independientes (en realidad se afectan más)
-
-_No considera tiempos de carga/descarga en nodos
-
-_Necesita datos históricos para calibrar bien las probabilidades
-
-# Aprendizajes:
+## Aprendizajes:
 
 Desarrollando esto aprendí sobre:
 
- Grafos y matrices dispersas para modelar redes eficientemente
+- Grafos y matrices dispersas para modelar redes eficientemente
+- Simulación Monte Carlo para explorar escenarios complejos
+- Inferencia Bayesiana para aprender de datos simulados
+- Optimización multi-objetivo y fronteras de Pareto
 
- Simulación Monte Carlo para explorar escenarios complejos
-
- Inferencia Bayesiana para aprender de datos simulados
-
- Optimización multi-objetivo y fronteras de Pareto
-
-# Agradecimientos
+## Agradecimientos
 
 A los profesores de la FIUNLZ que me desafiaron a pensar más allá de lo academico.
 
 A la comunidad open-source por las herramientas que utilice y recursos gratuitos de aprendizaje.
-
-
 
 ## Sobre el Autor
 
@@ -197,4 +148,5 @@ Con 20 años y formación en Ingeniería Industrial, desarrollé Prime Logistics
 ---
 
 *© 2026 Prime Logistics. Built to survive.*
+
 
