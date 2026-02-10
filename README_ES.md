@@ -26,7 +26,9 @@ Finalmente, el criterio de decisión empresarial cambió. Las organizaciones ya 
 
 
 ### Mi Solución: 4 Bloques que Trabajan Juntos
- Bloque 1: El "Gemelo Digital" de la Red
+ 
+### Bloque 1: El "Gemelo Digital" de la Red
+
 Convierte una red logística (depósitos, clientes, rutas) en matrices matemáticas.
 
 Lo hace de la siguiente manera:
@@ -53,6 +55,7 @@ def calcular_distancia(lat1, lon1, lat2, lon2):
 
 
 
+
 ### Bloque 2: El "Motor del Caos"
 
 Simula miles de posibles futuros donde las cosas pueden salir mal.
@@ -67,7 +70,8 @@ lo hace de la suguiente manera:
 
 Los eventos no son independientes. Un paro nacional hace 8 veces más probable una huelga local. Esto simula cascadas reales de problemas.
 
-Bloque 3: El "Auditor Bayesiano"
+
+### Bloque 3: El "Auditor Bayesiano"
 
 Aprende de las simulaciones para decirte qué partes de tu red son más frágiles.
 
@@ -86,7 +90,7 @@ Fragilidad = Probabilidad de fallo × Impacto promedio cuando falla
 Es importante porque una ruta que falla poco pero causa caos total es MÁS riesgosa que una que falla seguido pero con poco efecto.
 
 
-Bloque 4: El "Estratega"
+### Bloque 4: El "Estratega"
 
 Recomienda rutas considerando 3 cosas a la vez:
 
