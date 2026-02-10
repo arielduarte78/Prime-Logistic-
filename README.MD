@@ -23,7 +23,7 @@
 
 <hr/>
 
-## ⚡ System Capabilities / Capacidades del Sistema
+##  System Capabilities / Capacidades del Sistema
 
 <table>
 <tr>
@@ -86,7 +86,7 @@
 
 **Ariel Duarte**
 <br/>
-*Founder & Deep-Tech Engineer*
+*Industrial Engineering student*
 
 <p>
 <a href="https://www.linkedin.com/in/arielduarte-j/">
