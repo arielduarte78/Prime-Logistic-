@@ -1,4 +1,4 @@
-# 1. Planteamiento del Problema y Cambio de Paradigma
+# 1. Planteamiento del problema y cambio de paradigma
 
 La optimización logística clásica se formula, en general, como un problema combinatorio determinista: dada una red fija, con costos y restricciones conocidas, se busca una solución óptima **x*** que minimice una función objetivo escalar (por ejemplo, distancia, tiempo o costo monetario). Este enfoque es la base de modelos estándar como el camino mínimo, el problema del viajante (TSP) y los problemas de ruteo de vehículos (VRP).
 
@@ -8,27 +8,27 @@ En consecuencia, el problema real no consiste en encontrar una única ruta ópti
 
 Prime Logistics adopta explícitamente este cambio de paradigma. En lugar de modelar la incertidumbre como ruido aditivo sobre costos o tiempos, el sistema la trata como riesgo epistemológico sobre la integridad de la red, capturado mediante perturbaciones estocásticas y posterior inferencia probabilística. El objetivo no es calcular una solución óptima global para un único mundo realizado, sino evaluar estrategias sobre un conjunto amplio de estados de red simulados y seleccionar aquellas que exhiben mayor robustez, redundancia y una distribución favorable del riesgo.
 
-Formalmente, el problema no se reduce a minimizar una función de costo determinista, sino a operar sobre el espacio de rutas y políticas factibles, identificando soluciones que logran compromisos aceptables entre eficiencia, fragilidad y resiliencia estructural. En este sentido, Prime Logistics reformula la optimización logística como un problema de decisión estadística, donde el aprendizaje, la inferencia y la estructura de la información son tan relevantes como la optimalidad clásica basada en grafos.
+Formalmente, el problema no se reduce slamente a minimizar una función de costo determinista, sino a operar sobre el espacio de rutas y políticas factibles, identificando soluciones que logran compromisos aceptables entre eficiencia, fragilidad y resiliencia estructural. En este sentido, Prime Logistics reformula la optimización logística como un problema de decisión estadística, donde el aprendizaje, la inferencia y la estructura de la información son tan relevantes como la optimalidad clásica basada en grafos.
 
-## Nota sobre Implementación Algorítmica
+## Nota sobre implementación algorítmica
 
 Si bien el enfoque de Prime Logistics se aleja de la optimización determinista clásica, la implementación se apoya en algoritmos bien establecidos de la teoría de grafos y la optimización combinatoria, utilizados como bloques instrumentales dentro de un marco estocástico más amplio.
 
 En particular:
 
-- Para la generación de soluciones base y la evaluación de rutas factibles se emplean algoritmos de camino mínimo (por ejemplo, variantes de Dijkstra sobre grafos dirigidos y ponderados).
+- Para la generación de soluciones base y la evaluación de rutas factibles se emplean algoritmos de camino mínimo (variantes de Dijkstra sobre grafos dirigidos y ponderados).
 
 - La exploración de alternativas estructurales se realiza mediante resoluciones repetidas del problema de ruteo sobre instancias de red perturbadas estocásticamente.
 
-- La selección final no se basa en un único óptimo, sino en el análisis de soluciones candidatas sobre la frontera de Pareto, integrando múltiples métricas de desempeño.
+- La selección final se basa en el análisis de soluciones candidatas sobre la frontera de Pareto, integrando múltiples métricas de desempeño.
 
-Estos algoritmos no constituyen el núcleo conceptual del sistema, sino que actúan como mecanismos de proyección que permiten mapear el estado probabilístico de la red en decisiones operativas concretas.
+Estos algoritmos actúan como mecanismos de proyección que permiten mapear el estado probabilístico de la red en decisiones operativas concretas.
 
 
 # Bloque I
-## Definición Formal de la Red Logística (Gemelo Digital)
+## Definición formal de la red logística (Gemelo Digital)
 
-Esta sección establece el objeto matemático fundamental sobre el cual opera todo el framework de Prime Logistics. El propósito del Bloque I no es optimizar, predecir ni decidir. Su único objetivo es construir un gemelo digital estructuralmente válido y matemáticamente explícito de la red logística física.
+Esta sección establece el objeto matemático fundamental sobre el cual opera todo el framework de Prime Logistics. El propósito del Bloque I es construir un gemelo digital estructuralmente válido y matemáticamente explícito de la red logística física.
 
 Toda simulación estocástica e inferencia posterior se define estrictamente como operadores que actúan sobre este objeto.
 
@@ -56,25 +56,25 @@ Donde:
 
 Estas magnitudes se tratan como parámetros exógenos y observados. En este bloque no se les asigna interpretación probabilística alguna.
 
-### 2. Representación Matricial Multicapa
+### 2. Representación matricial multicapa
 
-En lugar de operar sobre objetos, el sistema proyecta **G** a un espacio vectorial mediante una representación matricial multicapa. Esta es la descripción canónica del estado base de la red.
+En lugar de operar sobre los objetos, el sistema proyecta **G** a un espacio vectorial mediante una representación matricial multicapa. Esta es la descripción canónica del estado base de la red.
 
 Sea **n = |V|**. Se definen las siguientes estructuras algebraicas:
 
-#### A. Matrices de Topología y Flujo (ℝⁿˣⁿ)
+#### A. Matrices de topología y flujo (ℝⁿˣⁿ)
 
-**Matriz de Adyacencia (A):** Define la conectividad topológica pura. Aᵢⱼ = 1 si existe camino valido, 0 no hay camino valido (i,j) ∈ E
+**Matriz de adyacencia (A):** Define la conectividad topológica pura. Aᵢⱼ = 1 si existe camino valido, 0 no hay camino valido (i,j) ∈ E
 
-**Matriz de Costos (C):** Contiene los costos operativos **cᵢⱼ**.
+**Matriz de costos (C):** Contiene los costos operativos **cᵢⱼ**.
 
-**Matriz de Tiempos (T):** Contiene los tiempos de tránsito **tᵢⱼ**.
+**Matriz de tiempos (T):** Contiene los tiempos de tránsito **tᵢⱼ**.
 
-**Matriz de Capacidades de Arco (K):** Define el límite superior de flujo permitido en el arco (i,j) (ej. tonelaje máximo de un puente o vía).
+**Matriz de capacidades de arco (K):** Define el límite superior de flujo permitido en el arco (i,j) (ej. tonelaje máximo de un puente o vía).
 
-#### B. Vector de Estado Nodal (ℝⁿ)
+#### B. Vector de estado nodal (ℝⁿ)
 
-**Vector de Demanda Neta (d):** d ∈ ℝⁿ = [d₁, d₂, ..., dₙ]ᵀ
+**Vector de demanda neta (d):** d ∈ ℝⁿ = [d₁, d₂, ..., dₙ]ᵀ
 
 Donde **dᵢ** representa el balance de carga del nodo:
 
@@ -84,37 +84,37 @@ Donde **dᵢ** representa el balance de carga del nodo:
 
 Todas las matrices comparten el mismo espacio de índices **V × V**, garantizando coherencia estructural para operaciones de álgebra lineal vectorizada.
 
-### 3. Validez Topológica y Restricciones de Factibilidad
+### 3. Validez topológica y restricciones de factibilidad
 
 Antes de habilitar cualquier proceso estocástico, el gemelo digital debe satisfacer condiciones estrictas de factibilidad, garantizadas por el módulo NetworkValidator.
 
 Formalmente, se imponen las siguientes restricciones:
 
-#### Consistencia Estructural
+#### Consistencia estructural
 Todas las matrices de atributos (C, T, K) deben respetar el patrón de dispersión (sparsity pattern) inducido por **A**.
 
 Aᵢⱼ = 0 ⇒ Cᵢⱼ, Tᵢⱼ, Kᵢⱼ = ∅ (o valor nulo/infinito según contexto)
 
-#### Admisibilidad Física
+#### Admisibilidad física
 cᵢⱼ > 0, tᵢⱼ > 0, kᵢⱼ ≥ 0 ∀(i,j) ∈ E
 
 Esto impide la existencia de ciclos de costo negativo o tiempos de viaje instantáneos que violen la causalidad.
 
-#### Conectividad Funcional
+#### Conectividad funcional
 El subgrafo inducido por los arcos activos debe garantizar caminos dirigidos desde los nodos de oferta (i | dᵢ < 0) hacia los nodos de demanda (j | dⱼ > 0).
 
-### 4. Separación Estricta entre Estructura e Incertidumbre
+### 4. Separación estricta entre estructura e incertidumbre
 
 Un principio central de diseño en Prime Logistics es la separación rigurosa entre **Topología (Bloque I)** y **Riesgo (Bloque II)**.
 
-**En el Bloque I:**
+**En el bloque I:**
 - Ningún arco posee probabilidad de fallo.
 - Los costos y tiempos son valores escalares fijos (esperanzas matemáticas nominales).
 - No se modela comportamiento aleatorio.
 
 La red se trata como un sistema físico determinista e inmutable. La incertidumbre se introduce únicamente más adelante como un operador de perturbación externo.
 
-### 5. Proyección Algorítmica (Nota de Implementación)
+### 5. Proyección algorítmica (Nota de implementación)
 
 La construcción del gemelo digital utiliza algoritmos de grafos clásicos y álgebra matricial (numpy/scipy) como mecanismos de proyección.
 
@@ -125,7 +125,7 @@ Su rol es interrogar la estructura estática.
 
 La inteligencia del sistema emerge únicamente cuando estas proyecciones deterministas son sometidas a estrés estocástico en los bloques posteriores.
 
-### 6. Rol Funcional dentro del Pipeline
+### 6. Rol Funcional dentro del pipeline
 
 El Bloque I entrega:
 
@@ -134,9 +134,9 @@ El Bloque I entrega:
 - Un sustrato limpio sobre el cual pueden actuar la simulación de Monte Carlo y la inferencia Bayesiana.
 
 
-# Bloque II —Simulación Estocástica y Propagación de Riesgo
+# Bloque II —Simulación estocástica y propagación de Riesgo
 
-## 1. Propósito del Bloque
+## 1. Propósito del bloque
 
 El Chaos Engine es el motor de inferencia estocástica de Prime Logistics. Su objetivo es someter al Gemelo Digital (construido en el Bloque I) a un proceso de estrés sistemático mediante simulación Monte Carlo.
 
