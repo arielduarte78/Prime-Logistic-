@@ -1,450 +1,337 @@
-# 1. Planteamiento del problema y cambio de paradigma
+# Prime Logistics: Optimización Logística bajo Incertidumbre Estructural
 
-La optimización logística clásica se formula, en general, como un problema combinatorio determinista: dada una red fija, con costos y restricciones conocidas, se busca una solución óptima **x*** que minimice una función objetivo escalar (por ejemplo, distancia, tiempo o costo monetario). Este enfoque es la base de modelos estándar como el camino mínimo, el problema del viajante (TSP) y los problemas de ruteo de vehículos (VRP).
+## 1. Planteamiento del problema y cambio de paradigma
 
-Este paradigma, sin embargo, descansa sobre una suposición implícita fuerte: que la red subyacente es estructuralmente estable. En sistemas logísticos reales, dicha suposición rara vez se cumple. Las redes de transporte están expuestas de forma continua a disrupciones como fallos mecánicos, huelgas, eventos climáticos, restricciones regulatorias y efectos de cascada por congestión. Estas perturbaciones introducen incertidumbre no solo en los pesos de las aristas, sino en la existencia y capacidad efectiva de las propias conexiones.
+La optimización logística clásica se formula, en general, como un problema combinatorio determinista: dada una red fija, con costos y restricciones conocidas, se busca una solución óptima \(x^*\) que minimice una función objetivo escalar (por ejemplo, distancia, tiempo o costo monetario). Este enfoque es la base de modelos estándar como el camino mínimo, el problema del viajante (TSP) y los problemas de ruteo de vehículos (VRP).
 
-En consecuencia, el problema real no consiste en encontrar una única ruta óptima bajo condiciones nominales, sino en seleccionar estrategias que permanezcan viables a lo largo de múltiples futuros posibles. Esto desplaza el foco desde la optimización determinista hacia la toma de decisiones bajo incertidumbre estructural, donde la topología de la red deja de ser un dato fijo y pasa a ser una variable aleatoria.
+Este paradigma, sin embargo, descansa sobre una suposición implícita fuerte: que la red subyacente es **estructuralmente estable**. En sistemas logísticos reales, dicha suposición rara vez se cumple. Las redes de transporte están expuestas de forma continua a disrupciones como fallos mecánicos, huelgas, eventos climáticos, restricciones regulatorias y efectos de cascada por congestión. Estas perturbaciones introducen incertidumbre no solo en los pesos de las aristas, sino en la existencia y capacidad efectiva de las propias conexiones.
 
-Prime Logistics adopta explícitamente este cambio de paradigma. En lugar de modelar la incertidumbre como ruido aditivo sobre costos o tiempos, el sistema la trata como riesgo epistemológico sobre la integridad de la red, capturado mediante perturbaciones estocásticas y posterior inferencia probabilística. El objetivo no es calcular una solución óptima global para un único mundo realizado, sino evaluar estrategias sobre un conjunto amplio de estados de red simulados y seleccionar aquellas que exhiben mayor robustez, redundancia y una distribución favorable del riesgo.
+En consecuencia, el problema real no consiste en encontrar una única ruta óptima bajo condiciones nominales, sino en seleccionar estrategias que permanezcan viables a lo largo de múltiples futuros posibles. Esto desplaza el foco desde la optimización determinista hacia la **toma de decisiones bajo incertidumbre estructural**, donde la topología de la red deja de ser un dato fijo y pasa a ser una variable aleatoria.
 
-Formalmente, el problema no se reduce slamente a minimizar una función de costo determinista, sino a operar sobre el espacio de rutas y políticas factibles, identificando soluciones que logran compromisos aceptables entre eficiencia, fragilidad y resiliencia estructural. En este sentido, Prime Logistics reformula la optimización logística como un problema de decisión estadística, donde el aprendizaje, la inferencia y la estructura de la información son tan relevantes como la optimalidad clásica basada en grafos.
+Prime Logistics adopta explícitamente este cambio de paradigma. En lugar de modelar la incertidumbre como ruido aditivo sobre costos o tiempos, el sistema la trata como **riesgo epistemológico sobre la integridad de la red**, capturado mediante perturbaciones estocásticas y posterior inferencia probabilística. El objetivo no es calcular una solución óptima global para un único mundo realizado, sino evaluar estrategias sobre un conjunto amplio de estados de red simulados y seleccionar aquellas que exhiben mayor robustez, redundancia y una distribución favorable del riesgo.
 
-## Nota sobre implementación algorítmica
+Formalmente, el problema no se reduce solamente a minimizar una función de costo determinista, sino a operar sobre el espacio de rutas y políticas factibles, identificando soluciones que logran compromisos aceptables entre eficiencia, fragilidad y resiliencia estructural. En este sentido, Prime Logistics reformula la optimización logística como un **problema de decisión estadística**, donde el aprendizaje, la inferencia y la estructura de la información son tan relevantes como la optimalidad clásica basada en grafos.
+
+### Nota sobre implementación algorítmica
 
 Si bien el enfoque de Prime Logistics se aleja de la optimización determinista clásica, la implementación se apoya en algoritmos bien establecidos de la teoría de grafos y la optimización combinatoria, utilizados como bloques instrumentales dentro de un marco estocástico más amplio.
 
 En particular:
-
 - Para la generación de soluciones base y la evaluación de rutas factibles se emplean algoritmos de camino mínimo (variantes de Dijkstra sobre grafos dirigidos y ponderados).
-
 - La exploración de alternativas estructurales se realiza mediante resoluciones repetidas del problema de ruteo sobre instancias de red perturbadas estocásticamente.
-
-- La selección final se basa en el análisis de soluciones candidatas sobre la frontera de Pareto, integrando múltiples métricas de desempeño.
+- La selección final se basa en el análisis de soluciones candidatas sobre la **frontera de Pareto exacta**, integrando múltiples métricas de desempeño mediante dominancia espacial.
 
 Estos algoritmos actúan como mecanismos de proyección que permiten mapear el estado probabilístico de la red en decisiones operativas concretas.
 
+---
 
-# Bloque I
-## Definición formal de la red logística (Gemelo Digital)
+## Bloque I — Ingesta Geoespacial y Topología Dinámica (V1.2)
 
-Esta sección establece el objeto matemático fundamental sobre el cual opera todo el framework de Prime Logistics. El propósito del Bloque I es construir un gemelo digital estructuralmente válido y matemáticamente explícito de la red logística física.
+La versión 1.2 erradica la dependencia de grafos estáticos precompilados. El Bloque I actúa como un motor geoespacial de instanciación bajo demanda (**Smart Lazy Loading**), transformando coordenadas y vectores de intención comercial en micro-grafos viales topológicamente válidos.
 
-Toda simulación estocástica e inferencia posterior se define estrictamente como operadores que actúan sobre este objeto.
+### 1. Resolución Topológica Bajo Demanda
 
+El sistema implementa una arquitectura de memoria en dos niveles para evitar el colapso computacional frente a datos geoespaciales a escala país:
+- **Pre-Warming (Nodos Críticos)**: Áreas de alta densidad logística (ej. centros de distribución primarios, AMBA) se mantienen en memoria precomputada.
+- **Smart Lazy Loading**: Cuando se exige un corredor inédito, el sistema identifica el vacío espacial, descarga exclusivamente la porción del polígono terrestre requerida, la purga de nodos aislados y la fusiona con la red global. Consultas subsecuentes sobre el mismo corredor operan con latencia cero a través del sistema de caché.
 
-### 1. La Red como Grafo Dirigido con Atributos
+### 2. Definición Nodal (Instalaciones Macro)
 
-El sistema logístico se modela como un grafo dirigido:
+Un **nodo** en este paradigma no representa intersecciones viales, sino **instalaciones físicas** que inyectan o absorben masa del sistema.
 
-**G = (V, E)**
+| Campo          | Tipo    | Requisito | Descripción                                      |
+|----------------|---------|-----------|--------------------------------------------------|
+| id             | String  | Obligatorio | Identificador único (ej. NODE_0001).             |
+| lat / lon      | Float   | Obligatorio | Coordenadas en grados decimales (WGS84).        |
+| supply         | Float   | Opcional  | Capacidad de despacho en toneladas métricas.     |
+| demand         | Float   | Opcional  | Necesidad de recepción en tonelétricas.          |
+| station_type   | String  | Obligatorio | Categoría funcional (warehouse, factory, port, etc.). |
+| proc_cost      | Float   | Opcional  | Costo fijo unitario por procesamiento en la instalación. |
+
+**Balance de Masa Nodal**:
+El comportamiento topológico del nodo se deduce determinísticamente mediante la ecuación de demanda neta:
+
+\[
+d_i = \text{Demand}_i - \text{Supply}_i
+\]
+
+- \(d_i < 0\): Nodo Fuente (Inyección de carga).
+- \(d_i > 0\): Nodo Sumidero (Absorción de carga).
+- \(d_i = 0\): Nodo de Transbordo estricto.
+
+### 3. Definición de Arcos (Intenciones de Corredor)
+
+Un **arco** ya no es un segmento de asfalto, sino un **vector de intención de viaje**. El motor geoespacial traduce esta intención en la infraestructura física subyacente.
+
+| Campo          | Tipo    | Requisito | Descripción                                              |
+|----------------|---------|-----------|----------------------------------------------------------|
+| id             | String  | Obligatorio | Identificador único del corredor (ej. ARC_0010).         |
+| origin         | String  | Obligatorio | ID del nodo de salida.                                   |
+| destination    | String  | Obligatorio | ID del nodo de llegada.                                  |
+| mode           | String  | Obligatorio | Perfil cinemático (truck, car, bus) que dicta la red a extraer. |
+| vehicle_cap    | Float   | Opcional  | Restricción de carga máxima del transporte asignado.     |
+
+### 4. Indexación Espacial (H3) y Jerarquía Topológica
+
+Para evitar la descarga ineficiente de polígonos masivos, el sistema fragmenta el globo utilizando el índice espacial **H3** (diseñado por Uber).
+
+1. **Definición del Pasillo**: Se proyecta una traza lineal entre el origen y el destino. El sistema recubre esta traza activando celdas H3, inyectando anillos concéntricos periféricos (buffers) para garantizar grados de libertad en el ruteo (desvíos por rutas secundarias).
+2. **Filtro de Jerarquía Logística**: Se implementa un modelo de resolución asimétrica:
+   - **Puntas (Terminales)**: En los hexágonos que contienen al Origen y Destino, se extrae la red vial completa (Nivel 1: calles locales, avenidas) para garantizar capilaridad en la última milla.
+   - **Corredor Troncal**: En los hexágonos intermedios, el motor aplica un filtro estricto de Nivel 3 (motorways, trunks, primary roads), descartando infraestructura urbana irrelevante para carga pesada y colapsando drásticamente el tamaño matricial del problema.
+
+### 5. Estándares, Fallbacks y Arquitectura Estructural
+
+La confiabilidad del gemelo digital depende de su tolerancia a anomalías en las fuentes externas (OpenStreetMap):
+- **Bóveda de Caché Criptográfica**: Todo subgrafo extraído se somete a hashing SHA-256 y escritura atómica (FileLock). Si un archivo GraphML resulta corrupto por interrupción de red, se aísla en cuarentena y se fuerza la re-descarga.
+- **Geometría de Fallback**: Si la extracción vial falla por ausencia de datos en el servidor externo, el sistema degrada de manera segura hacia la distancia geodésica utilizando la métrica de Haversine (radio terrestre de 6371 km).
+- **Traducción Matricial**: El módulo `topology.py` absorbe el grafo fusionado y lo proyecta en las matrices algebraicas definitivas de Adyacencia (\(A\)), Costo (\(C\)), Tiempo (\(T\)) y Capacidad (\(K\)), cerrando la brecha entre la geografía y el álgebra lineal requerida por el Bloque II.
+
+---
+
+## Bloque II — Simulación estocástica y propagación de Riesgo
+
+### 1. Propósito del bloque
+
+El **Chaos Engine** es el motor de inferencia estocástica de Prime Logistics. Su objetivo es someter al Gemelo Digital a un proceso de estrés sistemático mediante simulación Monte Carlo.
+
+A diferencia de los análisis de riesgo tradicionales que evalúan fallos aislados, este motor construye **Escenarios** (\(S_k\)): narrativas coherentes de degradación donde múltiples eventos interactúan, se amplifican mutuamente y deforman la topología y los atributos de la red simultáneamente.
+
+### 2. Definición del Estado Mutado
+
+Sea \(\mathcal{N}_0 = (A_0, C_0, T_0, K_0)\) el estado base determinista.
+
+Un escenario \(k\) genera una **Instantánea Mutada** \(\mathcal{N}_k\):
+
+\[
+\mathcal{N}_k = \Gamma(\mathcal{N}_0, \Omega_k, S_k)
+\]
 
 Donde:
+- \(\Omega_k\): Conjunto de eventos activos.
+- \(S_k\): Índice de Estrés Acumulado.
+- \(\Gamma\): Operador de mutación matricial.
 
-- **V = {v₁, ..., vₙ}** es el conjunto finito de nodos logísticos (plantas, depósitos, clientes), identificados por coordenadas geográficas validadas (φ, λ).
-- **E ⊆ V × V** es el conjunto de arcos dirigidos que representan enlaces de transporte físicamente factibles y activos.
+El estado mutado no es binario, es una deformación continua del espacio vectorial de la red.
 
-Cada arco **eᵢⱼ ∈ E** está caracterizado por un vector de atributos escalares proyectados:
+### 3. Taxonomía de Eventos y Manifiesto
 
-**w⃗ᵢⱼ = [cᵢⱼ, tᵢⱼ, kᵢⱼ]ᵀ**
+El universo de riesgos se define en un manifiesto declarativo:
+- **SYSTEMIC (Sistémico)**: Eventos de alcance nacional/regional.
+- **TACTICAL (Táctico)**: Eventos zonales o sectoriales.
+- **MICRO (Operativo)**: Fricción diaria.
 
-Donde:
+Cada evento \(E_i\) se define como:
 
-- **cᵢⱼ ∈ ℝ⁺**: Costo monetario determinista normalizado (resultado de la proyección de CostProfile sobre la distancia geodésica).
-- **tᵢⱼ ∈ ℝ⁺**: Tiempo de tránsito esperado en condiciones nominales (basado en SpeedProfile).
-- **kᵢⱼ ∈ ℝ⁺**: Capacidad máxima de flujo del arco (restricción física de la vía, no del vehículo).
+\[
+E_i = \langle Code, P_{base}, Target, Effects, Conditioners \rangle
+\]
 
-Estas magnitudes se tratan como parámetros exógenos y observados. En este bloque no se les asigna interpretación probabilística alguna.
+### 4. Mecánica de Cascada (Probabilidad Efectiva)
 
-### 2. Representación matricial multicapa
+El Chaos Engine no asume independencia entre sucesos. Implementa un modelo de inferencia causal donde la ocurrencia de eventos "padres" amplifica la probabilidad de eventos "hijos".
 
-En lugar de operar sobre los objetos, el sistema proyecta **G** a un espacio vectorial mediante una representación matricial multicapa. Esta es la descripción canónica del estado base de la red.
+\[
+P_{eff}(E_j | \Omega) = \min\left(1.0, P_{base}(E_j) \times \prod_{i \in \Omega} \phi_{i \to j}\right)
+\]
 
-Sea **n = |V|**. Se definen las siguientes estructuras algebraicas:
+### 5. Dinámica de Intensidad
 
-#### A. Matrices de topología y flujo (ℝⁿˣⁿ)
+El sistema introduce una variable de estado global \(S\) (Stress Index).
 
-**Matriz de adyacencia (A):** Define la conectividad topológica pura. Aᵢⱼ = 1 si existe camino valido, 0 no hay camino valido (i,j) ∈ E
+\[
+S = \sum_{i \in \Omega} \omega_i
+\]
 
-**Matriz de costos (C):** Contiene los costos operativos **cᵢⱼ**.
+El impacto final de un evento sobre las métricas escala dinámicamente con el estrés sistémico:
 
-**Matriz de tiempos (T):** Contiene los tiempos de tránsito **tᵢⱼ**.
+\[
+\mu_{final} = 1 + (\mu_{base} - 1) \cdot (1 + \lambda \cdot S)
+\]
 
-**Matriz de capacidades de arco (K):** Define el límite superior de flujo permitido en el arco (i,j) (ej. tonelaje máximo de un puente o vía).
+### 6. Operadores de Mutación Matricial
 
-#### B. Vector de estado nodal (ℝⁿ)
+El `NetworkActor` aplica los impactos directamente sobre las matrices dispersas:
+- **Corte Topológico**: \(A_{uv} \leftarrow 0, K_{uv} \leftarrow 0\)
+- **Degradación de Capacidad**: \(K_{uv} \leftarrow K_{uv} \cdot \beta_{cap}\)
+- **Inflación de Métricas**: \(C_{uv} \leftarrow C_{uv} \cdot \mu_{final}(\gamma, S)\)
 
-**Vector de demanda neta (d):** d ∈ ℝⁿ = [d₁, d₂, ..., dₙ]ᵀ
+### 7. Algoritmo de Generación Monte Carlo
 
-Donde **dᵢ** representa el balance de carga del nodo:
+1. **Clonación**: Copia profunda de \(\mathcal{N}_0\).
+2. **Propagación**: Iteración en orden topológico.
+3. **Activación Estocástica**: Se evalúa \(r \sim U[0,1]\). Si \(r < P_{eff}\), el evento se activa.
+4. **Acumulación de Estrés**: \(S \leftarrow S + weight(E)\).
+5. **Mutación**: Deformación de las matrices.
 
-- **dᵢ > 0**: Nodo de Demanda (Cliente)
-- **dᵢ < 0**: Nodo de Oferta (Depósito/Planta)
-- **dᵢ = 0**: Nodo de Transbordo (Paso)
+### 8. Criterio de Convergencia Estadística
 
-Todas las matrices comparten el mismo espacio de índices **V × V**, garantizando coherencia estructural para operaciones de álgebra lineal vectorizada.
+El motor monitorea la estabilidad en ventanas deslizantes para evitar sobrecómputo:
 
-### 3. Validez topológica y restricciones de factibilidad
+\[
+|\mu_{window} - \mu_{prev}| < \epsilon \quad \land \quad |\sigma^2_{window} - \sigma^2_{prev}| < \epsilon
+\]
 
-Antes de habilitar cualquier proceso estocástico, el gemelo digital debe satisfacer condiciones estrictas de factibilidad, garantizadas por el módulo NetworkValidator.
+### 9. Salida del Bloque
 
-Formalmente, se imponen las siguientes restricciones:
+El resultado es un objeto serializado que contiene:
+- El **Conjunto de Escenarios**: \(\mathcal{S} = \{Scenario_1, ..., Scenario_N\}\).
+- Metadatos y Estadísticas Agregadas.
 
-#### Consistencia estructural
-Todas las matrices de atributos (C, T, K) deben respetar el patrón de dispersión (sparsity pattern) inducido por **A**.
+Este conjunto \(\mathcal{S}\) constituye la entrada para el bloque III.
 
-Aᵢⱼ = 0 ⇒ Cᵢⱼ, Tᵢⱼ, Kᵢⱼ = ∅ (o valor nulo/infinito según contexto)
+---
 
-#### Admisibilidad física
-cᵢⱼ > 0, tᵢⱼ > 0, kᵢⱼ ≥ 0 ∀(i,j) ∈ E
+## Bloque III — Inferencia de Riesgo Estructural (Ortogonal)
 
-Esto impide la existencia de ciclos de costo negativo o tiempos de viaje instantáneos que violen la causalidad.
+### 1. Propósito del Bloque
 
-#### Conectividad funcional
-El subgrafo inducido por los arcos activos debe garantizar caminos dirigidos desde los nodos de oferta (i | dᵢ < 0) hacia los nodos de demanda (j | dⱼ > 0).
+El **Bayesian Auditor** actúa como el tribunal forense del sistema. Su función es procesar la evidencia empírica generada por el bloque II para transformar "datos de simulación" en "conocimiento de confiabilidad".
 
-### 4. Separación estricta entre estructura e incertidumbre
+A diferencia de modelos obsoletos que colapsan probabilidad y costo monetario en un escalar único (caja negra), este bloque respeta la dimensionalidad física del riesgo. Calcula la **probabilidad de fallo** y el **impacto esperado** de manera estrictamente separada y ortogonal, preparando el terreno tensorial para la optimización multiobjetivo.
 
-Un principio central de diseño en Prime Logistics es la separación rigurosa entre **Topología (Bloque I)** y **Riesgo (Bloque II)**.
+### 2. Auditoría Forense de Escenarios
 
-**En el bloque I:**
-- Ningún arco posee probabilidad de fallo.
-- Los costos y tiempos son valores escalares fijos (esperanzas matemáticas nominales).
-- No se modela comportamiento aleatorio.
+El primer paso es determinista. El módulo **Auditor** somete cada escenario simulado \(S_k\) a un juicio binario basado en `FailureCriteria`.
 
-La red se trata como un sistema físico determinista e inmutable. La incertidumbre se introduce únicamente más adelante como un operador de perturbación externo.
+Un escenario se declara **EXITOSO** (\(Y_k = 1\)) si y solo si cumple simultáneamente:
+- **Integridad de Capacidad**: \(K_{retained} \ge 85\%\)
+- **Estabilidad de Tiempos**: \(T_{travel} \le 1.4 \times T_{base}\)
+- **Eficiencia de Costos**: \(C_{total} \le 1.5 \times C_{base}\)
 
-### 5. Proyección algorítmica (Nota de implementación)
+Si alguna métrica viola el umbral, el escenario se marca como **FALLIDO** (\(Y_k = 0\)) y se registran los componentes causales.
 
-La construcción del gemelo digital utiliza algoritmos de grafos clásicos y álgebra matricial (numpy/scipy) como mecanismos de proyección.
+### 3. Modelo de Inferencia Beta-Binomial
 
-- El cálculo de atributos utiliza distancia geodésica (Haversine) vectorizada.
-- Los perfiles de costos complejos (CostProfile) se linealizan a valores escalares para construir la matriz **C**.
+Para inferir la confiabilidad latente \(\theta_u\) de cada componente \(u \in V \cup E\), utilizamos el modelo conjugado **Beta-Binomial**.
 
-Su rol es interrogar la estructura estática.
+#### a. Priors conjugados
+Asumimos una creencia inicial sobre la confiabilidad \(\theta_u\) (probabilidad de éxito):
 
-La inteligencia del sistema emerge únicamente cuando estas proyecciones deterministas son sometidas a estrés estocástico en los bloques posteriores.
+\[
+\theta_u \sim Beta(\alpha_0, \beta_0)
+\]
 
-### 6. Rol Funcional dentro del pipeline
+#### b. Actualización Bayesiana
+Al observar \(N\) escenarios, acumulamos éxitos (\(s_u\)) y fallos (\(f_u\)). La distribución posterior es analítica exacta:
 
-El Bloque I entrega:
+\[
+\theta_u | Data \sim Beta(\alpha_0 + s_u, \beta_0 + f_u)
+\]
 
-- Una representación matricial explícita (A, C, T, K, d).
-- Un gemelo digital validado y libre de ambigüedad semántica.
-- Un sustrato limpio sobre el cual pueden actuar la simulación de Monte Carlo y la inferencia Bayesiana.
+### 4. Desacople Dimensional del Riesgo (Probabilidad e Impacto)
 
+En lugar de construir métricas de "fragilidad compuesta" multiplicando variables incompatibles, el `BayesianJudge` extrae dos métricas fundamentales y ortogonales para cada componente \(u\):
 
-# Bloque II —Simulación estocástica y propagación de Riesgo
+1. **Probabilidad de fallo posterior** (\(P(F_u)\)):
+   La probabilidad pura de que el componente colapse.
+   \[
+   P(F_u) = 1 - E[\theta_u] = 1 - \frac{\alpha_{post}}{\alpha_{post} + \beta_{post}}
+   \]
 
-## 1. Propósito del bloque
+2. **Impacto promedio condicional** (\(\bar{I}_u\)):
+   El daño medio al sistema (fricción o costo adicional) observado exclusivamente en los escenarios donde el componente \(u\) falló.
 
-El Chaos Engine es el motor de inferencia estocástica de Prime Logistics. Su objetivo es someter al Gemelo Digital (construido en el Bloque I) a un proceso de estrés sistemático mediante simulación Monte Carlo.
+### 5. Salida: Reliability Report Ortogonal
 
-A diferencia de los análisis de riesgo tradicionales que evalúan fallos aislados, este motor construye Escenarios (Sₖ): narrativas coherentes de degradación donde múltiples eventos (sistémicos, tácticos y operativos) interactúan, se amplifican mutuamente y deforman la topología y los atributos de la red simultáneamente.
+El Bloque III rechaza la creación de una matriz de riesgo unificada. En su lugar, el `InferenceEngine` emite un **ReliabilityReport** que entrega colecciones de datos puros por componente:
 
-## 2. Definición del Estado Mutado
+Para cada arco y nodo, el reporte entrega el par desacoplado:
 
-Sea **𝒩₀ = (A₀, C₀, T₀, K₀)** el estado base determinista definido en el Bloque I.
+\[
+\{P(F_u), \bar{I}_u\}
+\]
 
-Un escenario **k** genera una Instantánea Mutada 𝒩ₖ:
-𝒩ₖ = Γ(𝒩₀, Ωₖ, Sₖ)
-Donde:
+Además de proveer los **Intervalos de Confianza** (varianza \(\sigma^2\)) para distinguir entre riesgo conocido y genuina incertidumbre sistémica. Estos datos crudos son el sustrato que el Bloque IV utilizará para proyectar los tensores espaciales.
 
-- **Ωₖ**: Conjunto de eventos activos en el escenario k.
-- **Sₖ**: Índice de Estrés Acumulado (Stress Index) del escenario.
-- **Γ**: Operador de mutación matricial (NetworkActor).
+---
 
-El estado mutado no es binario, es una deformación continua del espacio vectorial de la red (costos inflados, capacidades reducidas y conexiones cortadas).
+## Bloque IV — Optimización Estratégica Multiobjetivo (V1.3)
 
-## 3. Taxonomía de Eventos y Manifiesto
+### 1. Cambio de paradigma: Del Dijkstra Escalar a la Búsqueda Multiobjetivo
 
-El universo de riesgos se define en un manifiesto declarativo, estructurado jerárquicamente en tres niveles de impacto:
+La optimización tradicional (Dijkstra) colapsa todas las variables en un solo escalar alterando los pesos mediante un parámetro artificial (\(\kappa\)). Prime Logistics V1.3 abandona esta heurística.
 
-- **SYSTEMIC (Sistémico)**: Eventos de alcance nacional/regional (ej. Paro Nacional, Inundación). Afectan la integridad macroscópica de la red.
-- **TACTICAL (Táctico)**: Eventos zonales o sectoriales (ej. Bloqueo de Ruta, Corte de Energía).
-- **MICRO (Operativo)**: Fricción diaria (ej. Falla Mecánica, Congestión).
+El **MultiObjective Engine** trata el ruteo como un genuino problema geométrico de múltiples dimensiones en conflicto: **Supervivencia** (Seguridad) vs. **Costo Esperado** (Eficiencia). El objetivo del bloque no es hallar una ruta, sino descubrir la **Frontera de Pareto exacta** en una sola pasada de cómputo, revelando todos los trade-offs matemáticamente posibles.
 
-Cada evento **Eᵢ** se define como una tupla:
-Eᵢ = ⟨ Code, P_base, Target, Effects, Conditioners ⟩
+### 2. Preparación Espacial: Tensores Ortogonales
 
+Antes de la búsqueda, el `weight_builder` proyecta el grafo físico hacia un espacio tensorial de dos dimensiones utilizando los datos ortogonales entregados por el Bloque III.
 
-## 4. Mecánica de Cascada (Probabilidad Efectiva)
+Para cada arco \(e_{ij}\), se instancian dos pesos irreductibles:
 
-El Chaos Engine no asume independencia entre sucesos. Implementa un modelo de inferencia causal simplificada donde la ocurrencia de eventos "padres" amplifica la probabilidad de eventos "hijos".
+#### Eje 1: Peso de Supervivencia (\(W^{(1)}\))
 
-La probabilidad efectiva de activación de un evento **Eⱼ** dado un conjunto de eventos activos **Ω**, se calcula como:
+Dado que la probabilidad conjunta de un camino es multiplicativa (\(P_{ruta} = \prod (1 - P(F_i))\)), se aplica una transformación isomorfa al espacio logarítmico para volverla aditiva y compatible con algoritmos de grafos:
 
-P_eff(Eⱼ | Ω) = min(1.0, P_base(Eⱼ) × ∏ᵢ∈Ω φᵢ→ⱼ)
+\[
+W_{ij}^{(1)} = -\ln(1 - P(F_{ij}))
+\]
 
-Donde **φᵢ→ⱼ** es el multiplicador de impacto definido en los Conditioners del manifiesto. Esto permite modelar colapsos en cadena (ej. Inundación → Bloqueo de Ruta).
+(Minimizar \(W^{(1)}\) es matemáticamente idéntico a maximizar la supervivencia de la ruta).
 
-## 5. Dinámica de Intensidad 
+#### Eje 2: Costo Esperado Operativo (\(W^{(2)}\))
 
-El sistema introduce una variable de estado global **S** (Stress Index). Cada evento activo contribuye una carga de estrés **ωᵢ** al sistema:
+Se incorpora el costo base monetario/temporal más el daño friccional esperado en caso de fallo:
 
-S = ∑ᵢ∈Ω ωᵢ
+\[
+W_{ij}^{(2)} = C_{ij} + P(F_{ij}) \times \bar{I}_{ij}
+\]
 
-El impacto final de un evento sobre las métricas de la red (C o T) no es fijo, sino que escala dinámicamente con el estrés sistémico mediante el "Intensity Evaluator":
+(Minimizar \(W^{(2)}\) asegura eficiencia de capital bajo incertidumbre).
 
-μ_final = 1 + (μ_base - 1) · (1 + λ · S)
+### 3. El Motor de Label Setting y Dominancia \(\epsilon\)
 
-Donde:
+El núcleo del sistema es un algoritmo de **Multi-Objective Label Setting**. A diferencia de Dijkstra, un nodo no almacena la "mejor" distancia, sino un conjunto de **Etiquetas (Labels)** no dominadas. Una etiqueta \(L_a\) domina a \(L_b\) si es mejor o igual en ambos ejes (\(W^{(1)}\) y \(W^{(2)}\)) y estrictamente mejor en al menos uno.
 
-- **μ_base**: Multiplicador nominal del evento (ej. "el costo sube 20%").
-- **λ**: Coeficiente de sensibilidad global (α para Tiempos, γ para Costos).
+Para evitar la explosión combinatoria (la maldición de la dimensionalidad en grafos densos), el motor implementa **\(\epsilon\)-dominancia espacial**.
 
-Esto modela la no-linealidad del caos: un mismo incidente es más dañino en un sistema que ya está estresado.
+El espacio de soluciones de cada nodo se discretiza en una cuadrícula mediante dos tolerancias paramétricas (\(\epsilon_1\) para supervivencia y \(\epsilon_2\) para costo monetario):
 
-## 6. Operadores de Mutación Matricial
+\[
+Box = \left( \lfloor \frac{W^{(1)}}{\epsilon_1} \rfloor , \lfloor \frac{W^{(2)}}{\epsilon_2} \rfloor \right)
+\]
 
-El NetworkActor aplica los impactos directamente sobre las matrices dispersas para eficiencia computacional:
+El algoritmo aniquila en tiempo \(\mathcal{O}(1)\) cualquier etiqueta que caiga en una "caja" previamente conquistada por una ruta más eficiente, logrando un **Frente de Pareto \(\epsilon\)-aproximado** que protege la memoria sin perder resoluciones estratégicas.
 
-#### Corte Topológico:
-Si la acción es*DISABLE sobre un conjunto de arcos **ℐ**:
+### 4. Perfilado Estructural Analítico (Route Profiler)
 
-Aᵤᵥ ← 0, Kᵤᵥ ← 0 ∀ (u,v) ∈ ℐ
+Tras extraer las rutas supervivientes en el nodo de destino, el sistema ejecuta una "biopsia estructural" para caracterizar la calidad de la topología elegida:
 
-(Implementado mediante `tolil()`/`tocsr()` para manipulación rápida de estructuras dispersas).
+#### a. Entropía Relativa (Incertidumbre de Shannon)
 
-#### Degradación de Capacidad:
-Kᵤᵥ ← Kᵤᵥ · β_cap
-
-#### Inflación de Métricas (Costos/Tiempos):
-Cᵤᵥ ← Cᵤᵥ · μ_final(γ, S)
-Tᵤᵥ ← Tᵤᵥ · μ_final(α, S)
-
-## 7. Algoritmo de Generación Monte Carlo
-
-El proceso de generación de un escenario **k** sigue una ejecución secuencial estricta:
-
-1. **Clonación**: Se genera una copia profunda del estado base **𝒩₀**.
-2. **Propagación por Niveles**: Se iteran los eventos en orden topológico (SYSTEMIC → TACTICAL → MICRO).
-3. **Activación Estocástica**: Se evalúa **r ∼ U[0,1]**. Si **r < P_eff**, el evento se activa.
-4. **Acumulación de Estrés**: Se actualiza **S ← S + weight(E)**.
-5. **Mutación**: El NetworkActor deforma las matrices de **𝒩ₖ** según los efectos del evento y el **S** actual.
-
-## 8. Criterio de Convergencia Estadística
-
-Para evitar el sobrecómputo, el motor (MonteCarloEngine) monitorea la estabilidad estadística de la simulación en ventanas deslizantes (ej. 100 iteraciones).
-
-La simulación se detiene anticipadamente si se satisfacen simultáneamente las condiciones de estabilidad en Media y Varianza para la métrica de reducción de capacidad:
-
-| μ_window - μ_prev | < ε ∧ | σ²_window - σ²_prev | < ε
-
-## 9. Salida del Bloque
-
-El resultado es un objeto serializado (Pickle/JSON) que contiene:
-
-- **El Conjunto de Escenarios**: **𝓢 = { Scenario₁, ..., Scenario_N }**.
-- **Metadatos de Trazabilidad**: Qué eventos se activaron, sus probabilidades efectivas y el índice **S** resultante.
-- **Estadísticas Agregadas**: Distribución de pérdidas de capacidad y frecuencias de eventos críticos.
-
-Este conjunto **𝓢** constituye la entrada para el bloque III (Optimizador), que ya no optimizará sobre una red, sino sobre **N** redes mutadas.
-
-
-
-# Bloque III — Inferencia de Riesgo Estructural
-
-## 1. Propósito del Bloque
-
-El Bayesian Auditor actúa como el tribunal forense del sistema. Su función es procesar la evidencia empírica generada por el bloque II para transformar "datos de simulación" en "conocimiento de confiabilidad".
-
-A diferencia de un simple contador de fallas, este bloque implementa un motor de inferencia Bayesiana que:
-
-- Audita cada escenario contra criterios de éxito/fracaso industrial.
-- Actualiza la creencia sobre la confiabilidad de cada componente (Nodos y Arcos).
-- Pondera la probabilidad de fallo con la severidad del impacto observado.
-
-El resultado no es una estadística descriptiva, sino una matriz de riesgo predictiva (Φ) que guía al optimizador.
-
-## 2. Auditoría Forense de Escenarios
-
-El primer paso es determinista. El módulo **Auditor** somete cada escenario simulado **Sₖ** a un juicio binario basado en FailureCriteria.
-
-Un escenario se declara **EXITOSO (Yₖ = 1)** si y solo si cumple simultáneamente:
-
-1. **Integridad de Capacidad**: K_retained ≥ 85%
-2. **Estabilidad de Tiempos**: T_travel ≤ 1.4 × T_base
-3. **Eficiencia de Costos**: C_total ≤ 1.5 × C_base
-
-Si alguna métrica viola el umbral, el escenario se marca como **FALLIDO (Yₖ = 0)** y se registran los componentes causales (Nodos/Arcos) identificados por el Bloque II.
-
-## 3. Modelo de Inferencia Beta-Binomial
-
-Para inferir la confiabilidad latente **θᵤ** de cada componente **u** (donde **u ∈ V ∪ E**), utilizamos el modelo conjugado Beta-Binomial.
-
-### A. Priors conjugados
-Asumimos una creencia inicial sobre la confiabilidad **θᵤ** (probabilidad de éxito):
-
-θᵤ ∼ Beta(α₀, β₀)
-
-- **α₀**: Peso de la evidencia de éxito previa (Prior).
-- **β₀**: Peso de la evidencia de fallo previa.
-
-### B. Actualización Bayesiana 
-Al observar **N** escenarios, acumulamos éxitos (**sᵤ**) y fallos (**fᵤ**) específicos para el componente **u**. La distribución posterior es analítica exacta:
-
-θᵤ | Data ∼ Beta(α₀ + sᵤ, β₀ + fᵤ)
-
-Esto permite calcular la confiabilidad esperada (E[θᵤ]) y la varianza epistémica (incertidumbre de la estimación) sin costo computacional numérico.
-
-## 4. Métrica de Fragilidad Compuesta (Riesgo)
-
-Incorporamos la dimensión de impacto.
-
-No todos los fallos son iguales. El besianJudge calcula la fragilidad **Ψᵤ** como el producto de la probabilidad de fallo y la severidad promedio observada.
-
-**Probabilidad de fallo posterior:**
-
-P(Fᵤ) = 1 - E[θᵤ] = 1 - α_post / (α_post + β_post)
-
-
-**Impacto promedio condicional (Īᵤ):** 
-
-Es el daño medio al sistema (ej. % de capacidad perdida) observado en los escenarios donde el componente **u** falló.
-
-**Puntaje de fragilidad (Ψᵤ):**
-
-Ψᵤ = P(Fᵤ) × Īᵤ
-
-Este puntaje permite rankear los componentes: un nodo que falla poco pero catastróficamente puede tener mayor **Ψ** que uno que falla seguido pero sin consecuencias.
-
-## 5. Construcción de la Matriz de Riesgo (L_total)
-
-El InferenceEngine sintetiza el conocimiento en una matriz de riesgo de primer orden de tamaño **n × n**.
-
-Cada celda **(i, j)** representa el riesgo combinado de intentar un transporte directo entre el nodo **i** y el nodo **j**.
-
-El riesgo de la conexión **ℛᵢ→ⱼ** se modela como la probabilidad de fallo de la cadena lógica {Origen → Arco → Destino}, asumiendo independencia condicional en los fallos:
-
-ℛᵢ→ⱼ = 1 - [(1 - Ψᵢ) × (1 - Ψⱼ) × (1 - Ψ_arc)]
-
-
-Donde:
-- **Ψᵢ**: Fragilidad del nodo origen.
-- **Ψⱼ**: Fragilidad del nodo destino.
-- **Ψ_arc**: Fragilidad del arco que conecta i → j.
-
-## 6. Salida: Reliability Report
-
-El bloque emite un objeto ReliabilityReport inmutable que contiene:
-
-- **Risk matrix (ℛ)**: Tensor de riesgo para penalizar la función objetivo del optimizador.
-- **Ranking de fragilidad**: Lista ordenada de los componentes más críticos.
-- **Intervalos de Confianza**: Metadatos de varianza (σ²) para cada estimación, permitiendo distinguir entre "riesgo conocido" y "incertidumbre por falta de datos".
-
-Este reporte constituye el mapa de navegación de riesgo que utilizará el bloque IV para tomar decisiones robustas.
-
-
-
-# Bloque IV — Optimización estratégica y navegación de riesgo
-
-## 1. Cambio de paradigma: del Grafo físico al grafo de decisión
-
-El Prime Strategist opera sobre el grafo de riesgo Aumentado generado por el bloque III.
-
-En este espacio vectorial, el "costo" de un arco es una composición vectorial de eficiencia operativa y costo de seguridad latente.
-
-El objetivo del bloque es resolver un problema de decisión bajo incertidumbre estructural:
-
-> ¿Cuánto está dispuesto a pagar el operador por reducir la varianza de su operación?
-
-## 2. Scalarización paramétrica del riesgo (κ)
-
-Para permitir el uso de motores de búsqueda deterministas de alto rendimiento (como el **DijkstraEngine** implementado), el sistema utiliza una técnica de **scalarización paramétrica**.
-
-Se define el **peso generalizado (Wᵢⱼ)** de un arco como una función lineal del coeficiente de aversión al riesgo:
-
-Wᵢⱼ(κ) = Cᵢⱼ + κ · ℛᵢⱼ
-
-Donde:
-
-- **Cᵢⱼ**: Costo monetario/temporal base (determinista).
-- **κ (Kappa)**: Coeficiente de Aversión al Riesgo (el "precio sombra" que el usuario asigna a la seguridad).
-- **ℛᵢⱼ**: Peso de Riesgo transformado.
-
-Al variar **κ** desde **0** (neutralidad al riesgo) hasta **κₘₐₓ** (aversión total), el motor barre el espacio de soluciones y genera un conjunto de rutas candidatas óptimas para diferentes perfiles de decisión.
-
-## 3. Transformación Isomorfa Logarítmica
-
-Dado que la probabilidad de supervivencia de una ruta es multiplicativa (**P_ruta = ∏ pᵢ**), pero los algoritmos de grafos estándar operan sobre pesos aditivos, el motor aplica una transformación al espacio logarítmico.
-
-La fragilidad **φᵢⱼ** (inferida en el bloque III) se transforma en un **peso de riesgo aditivo (ℛᵢⱼ)**:
-
-ℛᵢⱼ = -ln(1 - φᵢⱼ)
-
-
-**Nota de implementación:** Se utiliza la función `np.log1p(-phi)` para garantizar estabilidad numérica en valores de probabilidad cercanos a 0.
-
-Esto asegura que minimizar la suma de **ℛᵢⱼ** sea matemáticamente equivalente a maximizar la probabilidad conjunta de supervivencia de la ruta.
-
-## 4. Perfilado Estructural (Route Profiler)
-
-Una vez hallada una ruta candidata, el sistema ejecuta una "biopsia estructural" (profiler.py) para calcular métricas de segundo orden que caracterizan la calidad del riesgo:
-
-### A. Entropía Relativa (Incertidumbre de Shannon)
 Mide la distribución del riesgo a lo largo de la ruta.
 
-H_rel(R) = [-∑ pᵢ log₂ pᵢ] / log₂ |R|
+\[
+H_{rel}(R) = \frac{-\sum p_i \log_2 p_i}{\log_2 |R|}
+\]
 
-- **H baja (< 0.3)**: Riesgo concentrado en un "punto unico de fallo". Estructuralmente frágil 
-- **H alta (> 0.7)**: Riesgo distribuido uniformemente. Estructuralmente robusto por ausencia de eslabones críticos.
+- \(H\) baja (< 0.3): Riesgo concentrado (frágil).
+- \(H\) alta (> 0.7): Riesgo distribuido uniformemente (robusto).
 
-### B. Índice de Rigidez
-Una métrica compuesta que evalúa la vulnerabilidad de la solución ante fallos catastróficos, combinando:
-- **Impacto del arco crítico**: El riesgo del eslabón más débil.
-- **Exposición nodal**: Porcentaje de nodos únicos visitados.
-- **Volatilidad de costos**: Desviación estándar de los pesos en la ruta.
-- **Vulnerabilidad de redundancia**: Ausencia de caminos alternativos (1 - RI).
+#### b. Índice de Rigidez
 
-## 5. Frontera de Pareto
+Una combinación lineal de vulnerabilidades que penaliza la exposición nodal, la alta volatilidad de costos y la falta de alternativas viables (Redundancia Estructural).
 
-El *Selector* evalúa las rutas candidatas generadas y construye la **Frontera de Pareto** en el espacio tridimensional:
+### 5. Extracción Euclidiana de Arquetipos Estratégicos
 
-( Minimizar Costo, Minimizar Rigidez, Maximizar Entropía )
+El módulo `pareto.py` no le entrega matemáticas crudas al usuario. Analiza geométricamente la Frontera de Pareto resultante y clasifica las soluciones en **arquetipos de negocio**, listos para la toma de decisión:
 
-El sistema descarta automáticamente cualquier solución Dominada (aquella para la cual existe otra opción que es mejor en todos los aspectos). Esto reduce el ruido decisional y presenta al usuario solo opciones eficientes.
+- **El Tanque**: Mínimo absoluto en el eje de Supervivencia (\(W^{(1)}\)). La opción "Zero-Trust", prioriza la seguridad atómica por sobre el capital.
+- **El Apostador**: Mínimo absoluto en el eje de Costo Esperado (\(W^{(2)}\)). Máxima eficiencia de flujo de caja, pero asume riesgos estructurales severos.
+- **El Equilibrista**: Mediante la normalización min-max de los extremos del frente, halla la solución con la mínima distancia Euclidiana al punto utópico \((0,0)\). El balance operativo perfecto.
+- **El Unicornio**: Detectado mediante una regla de negocio condicional. Si la diferencia porcentual de costo (sobrecosto) entre El Tanque y El Apostador es estadísticamente nula, la opción se clasifica como una anomalía de mercado de dominancia total (Bajo costo y Máxima seguridad).
 
-## 6. Clasificación de arquetipos estratégicos
+### 6. Salida del Sistema: Prime Strategic Report
 
-Para traducir la matemática compleja a un lenguaje de decisión humana, el *PrimeStrategicReporter* clasifica las soluciones supervivientes en *Arquetipos de Decisión*:
+El orquestador finaliza el ciclo entregando un reporte narrativo de inteligencia táctica. Traduce la matemática de \(\epsilon\)-dominancia y las entropías en una recomendación de acción directa ("Ejecutar", "Monitorear", "Descartar") junto con un porcentaje de **Confianza del Sistema** derivado de los pesos estructurales, culminando la evolución de Prime Logistics hacia una arquitectura **Deep-Tech empresarial**.
 
-### El Unicornio
-- **Perfil**: Bajo Costo / Alta Resiliencia.
-- **Diagnóstico**: Una anomalía de mercado positiva. La opción dominante absoluta.
+---
 
-### El Tanque
-- **Perfil**: Alto Costo / Máxima Resiliencia.
-- **Diagnóstico**: Opción blindada para carga crítica. Enfoque "Confianza-minima".
-
-### El Apostador
-- **Perfil**: Mínimo Costo / Baja Resiliencia / Baja Entropía.
-- **Diagnóstico**: Eficiente pero frágil. Depende de que un arco crítico específico no falle.
-
-### El Equilibrista
-- **Perfil**: Compromiso eficiente (Trade-off óptimo) según el **κ** actual.
-
-## 7. Salida del Bloque: 
-
-El Bloque IV entrega un reporte narrativo de inteligencia que incluye:
-
-- **Auditoría Forense**: Validación de restricciones duras.
-- **Navegacion profunda**: Desglose de Entropía, Rigidez e Índices de Redundancia.
-- **Veredicto Táctico**: Una recomendación de acción clara ("Ejecutar", "Monitorear", "Descartar") y un nivel de confianza del sistema (recommendation_strength).
-
-De esta forma, Prime Logistics trasciende la función de "calculadora de rutas" para convertirse en un **consultor estratégico automatizado**.
-
-##  Limitaciones Conocidas y Suposiciones 
+## Limitaciones Conocidas y Suposiciones
 
 Para mantener la viabilidad computacional en este MVP, el modelo acepta los siguientes trade-offs teóricos:
 
-### 1. **Independencia ingenua en la inferencia**
-La actualización Beta-Binomial asume intercambiabilidad de las ejecuciones de simulación. Si bien se generan fallas correlacionadas (cascadas), el paso de inferencia trata la evidencia como pseudo-independiente para calcular la fragilidad local. Esto puede llevar a una confianza excesiva en el posterior para redes altamente acopladas.
-
-### 2. **Enfoque Estructural vs. Operacional**
-El modelo minimiza el *riesgo estructural* (disponibilidad de conexiones) en lugar de la *latencia operacional* (retrasos en colas). Actualmente no implementa dinámicas de colas M/G/k en los nodos; solo considera restricciones de capacidad puras.
-
-### 3. **Flujo estático**
-El optimizador actual asume enrutamiento estático por paso de simulación, ignorando las capacidades de re-enrutamiento dinámico de los agentes *durante* el evento de falla.
-
-
+1. **Independencia ingenua en la inferencia**: La actualización Beta-Binomial asume intercambiabilidad de las ejecuciones de simulación. Si bien se generan fallas correlacionadas (cascadas), el paso de inferencia trata la evidencia como pseudo-independiente para calcular la probabilidad local. Esto puede llevar a una confianza excesiva en el posterior para redes altamente acopladas.
+2. **Enfoque Estructural vs. Operacional**: El modelo minimiza el riesgo estructural (disponibilidad física de conexiones) en lugar de la latencia operacional (retrasos en colas). Actualmente no implementa dinámicas estocásticas de colas (M/G/k) en los nodos.
+3. **Flujo estático**: El optimizador multiobjetivo asume enrutamiento estático preventivo antes del inicio del viaje, ignorando las capacidades de re-enrutamiento dinámico (Markov Decision Processes) de los agentes durante el evento de falla en tiempo real.
